@@ -1,0 +1,9 @@
+This is my lightweight unit testing module. For further information send a mail to Guillaume Filion <guillaume.filion@gmail.com>.
+
+To run the example:
+
+make test
+
+To debug the programme with smart breakpoints:
+
+make inspect
