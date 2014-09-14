@@ -2,6 +2,10 @@
 #include "_unittest.h"
 
 //     Global variables     //
+void *(*MALLOC_CALL)(size_t) = __libc_malloc;
+void *(*REALLOC_CALL)(void *, size_t) = __libc_realloc;
+
+static double   ALLOC_ERR_PROB;
 static FILE * DEBUG_DUMP_FILE;
 static int    N_ERROR_MESSAGES;
 static int    ORIG_STDERR_DESCRIPTOR;
@@ -154,6 +158,8 @@ test_case_init
 )
 {
 
+   reset_alloc();
+
    N_ERROR_MESSAGES = 0;
 
    if (run_flags & FORK_YES) {
@@ -216,14 +222,6 @@ test_case_clean
 }
    
 
-char *
-sent_to_stderr
-(void)
-{
-   return STDERR_BUFFER;
-}
-
-
 void
 redirect_stderr
 (void)
@@ -249,8 +247,6 @@ redirect_stderr
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
-   // Fill the buffer (needed for reset).
-   fprintf(stderr, "unittest: nothing sent to stderr\n");
    fflush(stderr);
    *STDERR_OFF = 1;
 }
@@ -330,3 +326,60 @@ debug_fail_dump
    fprintf(DEBUG_DUMP_FILE, "b %s\n", function);
 }
 
+
+char *
+caught_in_stderr
+(void)
+{
+   return STDERR_BUFFER;
+}
+
+
+void *
+malloc
+(
+   size_t size
+)
+{
+   return (*MALLOC_CALL)(size);
+}
+
+void *
+realloc
+(
+   void *ptr,
+   size_t size
+)
+{
+   return (*REALLOC_CALL)(ptr, size);
+}
+
+
+void *
+fail_prone_malloc(size_t size)
+{
+   return drand48() < ALLOC_ERR_PROB ? NULL : __libc_malloc(size);
+}
+
+void *
+fail_prone_realloc(void *ptr, size_t size)
+{
+   return drand48() < ALLOC_ERR_PROB ? NULL : __libc_realloc(ptr, size);
+}
+
+void
+set_alloc_failure_rate_to(double p)
+{
+   ALLOC_ERR_PROB = p;
+   MALLOC_CALL = fail_prone_malloc;
+   REALLOC_CALL = fail_prone_realloc;
+}
+
+void
+reset_alloc
+(void)
+{
+   ALLOC_ERR_PROB = 0.0;
+   MALLOC_CALL = __libc_malloc;
+   REALLOC_CALL = __libc_realloc;
+}
