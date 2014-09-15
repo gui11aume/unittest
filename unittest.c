@@ -4,8 +4,9 @@
 //     Global variables     //
 void *(*MALLOC_CALL)(size_t) = __libc_malloc;
 void *(*REALLOC_CALL)(void *, size_t) = __libc_realloc;
+void *(*CALLOC_CALL)(size_t, size_t) = __libc_calloc;
 
-static double   ALLOC_ERR_PROB;
+static double ALLOC_ERR_PROB;
 static FILE * DEBUG_DUMP_FILE;
 static int    N_ERROR_MESSAGES;
 static int    ORIG_STDERR_DESCRIPTOR;
@@ -247,6 +248,7 @@ redirect_stderr
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
+   fprintf(stderr, "$");
    fflush(stderr);
    *STDERR_OFF = 1;
 }
@@ -354,6 +356,15 @@ realloc
    return (*REALLOC_CALL)(ptr, size);
 }
 
+void *
+calloc
+(
+   size_t nitems,
+   size_t size
+)
+{
+   return (*CALLOC_CALL)(nitems, size);
+}
 
 void *
 fail_prone_malloc(size_t size)
@@ -367,12 +378,19 @@ fail_prone_realloc(void *ptr, size_t size)
    return drand48() < ALLOC_ERR_PROB ? NULL : __libc_realloc(ptr, size);
 }
 
+void *
+fail_prone_calloc(size_t nitems, size_t size)
+{
+   return drand48() < ALLOC_ERR_PROB ? NULL : __libc_calloc(nitems, size);
+}
+
 void
 set_alloc_failure_rate_to(double p)
 {
    ALLOC_ERR_PROB = p;
    MALLOC_CALL = fail_prone_malloc;
    REALLOC_CALL = fail_prone_realloc;
+   CALLOC_CALL = fail_prone_calloc;
 }
 
 void
@@ -382,4 +400,5 @@ reset_alloc
    ALLOC_ERR_PROB = 0.0;
    MALLOC_CALL = __libc_malloc;
    REALLOC_CALL = __libc_realloc;
+   CALLOC_CALL = __libc_calloc;
 }
