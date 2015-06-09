@@ -1,11 +1,13 @@
 P= runtests
-OBJECTS= example.o tests.o libunittest.so
+OBJECTS= libunittest.so
+SOURCES= runtests.c
 CFLAGS= -std=gnu99 -g -Wall -O0
+	# Add the following flags for test coverage or profiling.
 	#-fprofile-arcs -ftest-coverage -pg
 LDLIBS= -L`pwd` -Wl,-rpath=`pwd` -lunittest
 CC= gcc
-$(P): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(LDLIBS) -o $(P)
+$(P): $(OBJECTS) $(SOURCES)
+	$(CC) $(CFLAGS) $(SOURCES) $(OBJECTS) $(LDLIBS) -o $(P)
 
 clean:
 	rm -f $(P) $(OBJECTS) *.gcda *.gcno *.gcov .inspect.gdb
@@ -20,4 +22,7 @@ inspect: $(P)
 	gdb --command=.inspect.gdb --args $(P)
 
 valgrind: $(P)
-	valgrind --vgdb=yes --vgdb-error=0 ./$(P)
+	valgrind --leak-check=full ./$(P) --debug
+
+vgdb: $(P)
+	valgrind --vgdb=yes --vgdb-error=0 ./$(P) --debug
