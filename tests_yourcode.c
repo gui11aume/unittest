@@ -56,6 +56,23 @@ void
 test_case_5
 (void)
 {
+   // In this test a segmentation fault will happen.
+   // This will cause the test to fail, but the execution
+   // will nevertheless continue to the next test.
+
+   if (*(int*) 0x0 == 0) {
+      printf("won't be executed (segfault before)\n");
+   }
+
+   return;
+
+}
+
+
+void
+test_case_6
+(void)
+{
    char * c = call_malloc(); 
    // Use 'test_assert_critical()' to interrupt the test
    // in case assertion fails. In the example below 'c'
@@ -85,3 +102,14 @@ test_case_5
    reset_alloc();
 
 }
+
+// Define test cases to be run (for export).
+const test_case_t test_cases_from_file_1[] = {
+   {"example/1", test_case_1},
+   {"example/2", test_case_2},
+   {"stderr/1",  test_case_3},
+   {"stderr/2",  test_case_4},
+   {"crash/1",   test_case_5},
+   {"malloc/1",  test_case_6},
+   {NULL, NULL}, // Sentinel. //
+};

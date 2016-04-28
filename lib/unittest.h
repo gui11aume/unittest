@@ -1,4 +1,6 @@
 #include <fcntl.h>
+#include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,8 +15,6 @@
 //     Constants     //
 #define UTEST_BUFFER_SIZE 1024
 #define MAX_N_ERROR_MESSAGES 20
-#define FORK_NO 0
-#define FORK_YES 1
 
 
 //     Type definitions      // 
@@ -49,7 +49,7 @@ run_unittest
 (
          int             argc,
          char         ** argv,
-   const test_case_t     test_cases[]
+   const test_case_t   * test_cases[]
 );
 
 void

@@ -1,6 +1,4 @@
 #include "unittest.h"
-// Include test source.
-#include "test_yourcode.c"
 
 int
 main(
@@ -9,17 +7,14 @@ main(
 )
 {
 
-   // Register test cases //
-   const static test_case_t test_cases[] = {
-      {"example/1", test_case_1},
-      {"example/2", test_case_2},
-      {"stderr/1", test_case_3},
-      {"stderr/2", test_case_4},
-      {"malloc/1", test_case_5},
-      {NULL, NULL}
+   // Import the test cases from linked files. //
+   extern test_case_t test_cases_from_file_1[];
+
+   const test_case_t *test_case_list[] = {
+      test_cases_from_file_1,
+      NULL, // Sentinel. //
    };
 
-   // Run tests.
-   return run_unittest(argc, argv, test_cases);
+   return run_unittest(argc, argv, test_case_list);
 
 }
