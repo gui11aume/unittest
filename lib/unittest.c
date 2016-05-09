@@ -39,11 +39,30 @@ static int    TEST_CASE_FAILED;
 //     Function definitions     //
 
 void
+update_display_failed
+(void)
+{
+   fprintf(stderr, "FAIL\n");
+}
+
+void
+update_display_success
+(void)
+{
+   fprintf(stderr, "  OK\n");
+}
+
+void
 terminate_thread
 (
    int sig
 )
 {
+
+   // If test was not failed so far, update display.
+   if (!TEST_CASE_FAILED) {
+      update_display_failed();
+   }
 
    fprintf(stderr, "caught SIGTERM (interrupting)\n");
 
@@ -78,17 +97,23 @@ run_unittest
    // Run test cases in sequential order.
    for (int j = 0 ; test_case_list[j] != NULL ; j++) {
 
-      const test_case_t *test_cases = test_case_list[j];
-      for (int i = 0 ; test_cases[i].fixture != NULL ; i++) {
+      const test_case_t *tests = test_case_list[j];
+      for (int i = 0 ; tests[i].fixture != NULL ; i++) {
 
-         // Some verbose information. //
-         fprintf(stderr, "%s\n", test_cases[i].test_name);
+         // Test display. //
+         fprintf(stderr, "%s%*s", tests[i].test_name,
+                  28 - (int) strlen(tests[i].test_name), "");
 
          // Run test case in thread. //
-         pthread_create(&tid, NULL, run_testset, (void *) &test_cases[i]);
+         pthread_create(&tid, NULL, run_testset, (void *) &tests[i]);
          pthread_join(tid, NULL);
 
-         nbad += TEST_CASE_FAILED;
+         if (TEST_CASE_FAILED) {
+            nbad++;
+         }
+         else {
+            update_display_success();
+         }
 
       }
 
@@ -259,20 +284,39 @@ assert_fail_non_critical
    const char         * function
 )
 {
+
+   // If first failed assertion of the test
+   // case, update display for the user.
+   if (!TEST_CASE_FAILED) {
+      update_display_failed();
+   }
+
    TEST_CASE_FAILED = 1;
+
+   // Don't show more than 'MAX_N_ERROR_MESSAGES'.
+   // TODO: allow the user to show all error messages.
    if (++N_ERROR_MESSAGES > MAX_N_ERROR_MESSAGES + 1) return;
-   int switch_stderr = STDERR_OFF;
-   if (switch_stderr) unredirect_stderr();
+
+   // If stderr is redirected, we will need to
+   // take it back to display the error message.
+   int toggle_stderr = STDERR_OFF;
+   if (toggle_stderr) unredirect_stderr();
+
    if (N_ERROR_MESSAGES == MAX_N_ERROR_MESSAGES + 1) {
       fprintf(stderr, "more than %d failed assertions...\n",
             MAX_N_ERROR_MESSAGES);
    }
+
    else {
       fprintf(stderr, "assertion failed in %s(), %s:%d: `%s'\n",
             function, file, lineno, assertion);
    }
+
+   // Flush stderr and put it back as it was (ie redirect
+   // it if it was redirected, or leave it as is otherwise).
    fflush(stderr);
-   if (switch_stderr) redirect_stderr();
+   if (toggle_stderr) redirect_stderr();
+
 }
 
 
@@ -285,11 +329,20 @@ assert_fail_critical
    const char         * function
 )
 {
+   // If test was not failed so far, update display.
+   if (!TEST_CASE_FAILED) {
+      update_display_failed();
+   }
+
    TEST_CASE_FAILED = 1;
+
+   // That's the end of the test case. We can
+   // take back stderr without worries.
    unredirect_stderr();
    fprintf(stderr, "assertion failed in %s(), %s:%d: `%s' (CRITICAL)\n",
          function, file, lineno, assertion);
    fflush(stderr);
+
 }
 
 
