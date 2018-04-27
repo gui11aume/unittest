@@ -24,7 +24,7 @@ static char * STDERR_BUFFER;
 static int    STDERR_OFF;
 static int    TEST_CASE_FAILED;
 
- static int    SHOWALL = 0;
+static int    SHOWALL = 0;
 
 
 //     Function definitions     //
@@ -329,6 +329,7 @@ void *(*SYSTEM_MALLOC) (malloc_zone_t *, size_t);
 void *(*SYSTEM_CALLOC) (malloc_zone_t *, size_t, size_t);
 void *(*SYSTEM_REALLOC) (malloc_zone_t *, void *, size_t);
 
+
 void
 mac_specific_initialization
 (void)
@@ -539,7 +540,7 @@ run_unittest
 			SHOWALL = 1;
 			break;
 		default:
-			fprintf(stderr, "cannot parse command line argments\n");
+			fprintf(stderr, "cannot parse command line arguments\n");
 			return EXIT_FAILURE;
 		}
 	}

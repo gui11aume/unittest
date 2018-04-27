@@ -67,26 +67,26 @@ void fail_debug_dump (const char *, int, const char *);
 
 //    Assert macros    //
 #define test_assert(expr)  do { \
-        if (expr)  { (void) 0; } \
-        else { \
-           fail_debug_dump(__FILE__, __LINE__, __func__); \
-           fail_non_critical(#expr, __FILE__, __LINE__, __func__); \
-	}} while (0)
+  if (expr)  { (void) 0; } \
+  else { \
+     fail_debug_dump(__FILE__, __LINE__, __func__); \
+     fail_non_critical(#expr, __FILE__, __LINE__, __func__); \
+}} while (0)
 
 #define test_assert_critical(expr) do { \
-        if (expr)  { (void) 0; } \
-        else { \
-           fail_debug_dump(__FILE__, __LINE__, __func__); \
-           fail_critical(#expr, __FILE__, __LINE__, __func__); \
-           return; \
-	}} while (0)
+  if (expr)  { (void) 0; } \
+  else { \
+     fail_debug_dump(__FILE__, __LINE__, __func__); \
+     fail_critical(#expr, __FILE__, __LINE__, __func__); \
+     return; \
+}} while (0)
 
 #define test_assert_stderr(expr) do { \
-        if (strcmp(expr, caught_in_stderr()) == 0)  { (void) 0; } \
-        else { \
-           fail_debug_dump(__FILE__, __LINE__, __func__); \
-           fail_non_critical(#expr, __FILE__, __LINE__, __func__); \
-           return; \
-	}} while (0)
+  if (strncmp(expr, caught_in_stderr(), strlen(expr)) == 0) { (void) 0; } \
+  else { \
+     fail_debug_dump(__FILE__, __LINE__, __func__); \
+     fail_non_critical(#expr, __FILE__, __LINE__, __func__); \
+     return; \
+}} while (0)
 
 #endif
