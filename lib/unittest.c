@@ -15,16 +15,17 @@ void   test_case_clean (void);
 void   test_case_init (void);
 
 //     Global variables     //
-static double ALLOC_ERR_PROB;
-static int    ALLOC_FAIL_COUNTER;
-static FILE * DEBUG_DUMP_FILE;
-static int    N_ERROR_MSG;
-static int    ORIG_STDERR_DESCRIPTOR;
-static char * STDERR_BUFFER;
-static int    STDERR_OFF;
-static int    TEST_CASE_FAILED;
+static double ALLOC_ERR_PROB = 0.0;
+static int    ALLOC_FAIL_COUNTER = 0;
+static FILE * DEBUG_DUMP_FILE = NULL;
+static int    N_ERROR_MSG = 0;
+static int    ORIG_STDERR_DESCRIPTOR = -1;
+static char * STDERR_BUFFER = NULL;
+static int    STDERR_OFF = 0;
+static int    TEST_CASE_FAILED = 0;
 
 static int    SHOWALL = 0;
+static int    INSPECT = 0;
 
 
 //     Function definitions     //
@@ -109,7 +110,8 @@ void
 unit_test_init
 (void)
 {
-
+   // In inspect mode, no debug information is recorded.
+   if (INSPECT) return;
    DEBUG_DUMP_FILE = fopen(".inspect.gdb", "w");
    if (DEBUG_DUMP_FILE == NULL) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
@@ -123,9 +125,12 @@ unit_test_clean
 (void)
 {
 
-   fprintf(DEBUG_DUMP_FILE, "b run_unittest\n");
-   fprintf(DEBUG_DUMP_FILE, "run\n");
-   fclose(DEBUG_DUMP_FILE);
+   // In inspect mode, no debug information is recorded.
+   if (INSPECT || DEBUG_DUMP_FILE != NULL) {
+      fprintf(DEBUG_DUMP_FILE, "b run_unittest\n");
+      fprintf(DEBUG_DUMP_FILE, "run --inspect\n");
+      fclose(DEBUG_DUMP_FILE);
+   }
 
 }
 
@@ -304,11 +309,9 @@ fail_debug_dump
    const char * function
 )
 // When a test fails, write a gdb file with a breakpoint at
-// the function that failed, and another one at the line
-// where the failured happened.
+// the line where the failured happened.
 {
    fprintf(DEBUG_DUMP_FILE, "b %s:%d\n", file, lineno);
-   fprintf(DEBUG_DUMP_FILE, "b %s\n", function);
    fflush(DEBUG_DUMP_FILE);
 }
 
@@ -322,6 +325,19 @@ caught_in_stderr
 
 
 
+void
+machine_specific_initialization
+(void)
+{
+#ifdef __APPLE__
+   malloc_zone_t *zone = malloc_default_zone();
+   SYSTEM_MALLOC = zone->malloc;
+   SYSTEM_CALLOC = zone->calloc;
+   SYSTEM_REALLOC = zone->realloc;
+#endif
+}
+
+
 #ifdef __APPLE__
 // Intercept calls to 'malloc()' on MacOS //
 #include <malloc/malloc.h>
@@ -329,16 +345,6 @@ void *(*SYSTEM_MALLOC) (malloc_zone_t *, size_t);
 void *(*SYSTEM_CALLOC) (malloc_zone_t *, size_t, size_t);
 void *(*SYSTEM_REALLOC) (malloc_zone_t *, void *, size_t);
 
-
-void
-mac_specific_initialization
-(void)
-{
-   malloc_zone_t *zone = malloc_default_zone();
-   SYSTEM_MALLOC = zone->malloc;
-   SYSTEM_CALLOC = zone->calloc;
-   SYSTEM_REALLOC = zone->realloc;
-}
 
 void *
 fail_countdown_malloc(malloc_zone_t *zone, size_t size)
@@ -515,19 +521,18 @@ run_unittest
 )
 {
 
-#ifdef __APPLE__
-   mac_specific_initialization();
-#endif
+   machine_specific_initialization();
 
 	// Parse command line options.
    while(1) {
       int option_index = 0;
       static struct option long_options[] = {
          {"showall", no_argument, &SHOWALL,  1},
+         {"inspect", no_argument, &INSPECT,  1},
          {0, 0, 0, 0}
       };
 
-      int c = getopt_long(argc, argv, "a",
+      int c = getopt_long(argc, argv, "ai",
             long_options, &option_index);
 
       // Done parsing named options. //
@@ -538,6 +543,9 @@ run_unittest
          break;
 		case 'a':
 			SHOWALL = 1;
+			break;
+		case 'i':
+			INSPECT = 1;
 			break;
 		default:
 			fprintf(stderr, "cannot parse command line arguments\n");
@@ -558,7 +566,7 @@ run_unittest
       const test_case_t *tests = test_case_list[j];
       for (int i = 0 ; tests[i].fixture != NULL ; i++) {
 
-         // Test display. //
+         // Display of the test. //
          fprintf(stderr, "%s%*s", tests[i].test_name,
                   28 - (int) strlen(tests[i].test_name), "");
 
