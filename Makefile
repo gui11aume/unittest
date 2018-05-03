@@ -13,7 +13,7 @@ INCLUDES= -Ilib
 COVERAGE= -fprofile-arcs -ftest-coverage
 PROFILE= -pg
 CFLAGS= -std=gnu99 -g -Wall -O0 $(INCLUDES) $(COVERAGE) $(PROFILE)
-LDLIBS= -L. -lunittest -lpthread
+LDLIBS= -L. -Wl,-rpath,. -lunittest -lpthread
 
 # Use different flags on Linux and MacOS.
 ifeq ($(shell uname -s),Darwin)
