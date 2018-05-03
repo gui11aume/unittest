@@ -11,7 +11,8 @@ INCLUES= lib
 CC= gcc
 INCLUDES= -Ilib
 COVERAGE= -fprofile-arcs -ftest-coverage
-CFLAGS= -std=gnu99 -g -Wall -O0 $(INCLUDES) $(COVERAGE)
+PROFILE= -pg
+CFLAGS= -std=gnu99 -g -Wall -O0 $(INCLUDES) $(COVERAGE) $(PROFILE)
 LDLIBS= -L. -lunittest -lpthread
 
 # Use different flags on Linux and MacOS.
@@ -26,7 +27,8 @@ $(P): $(OBJECTS) $(SOURCES) $(HEADERS) runtests.c
 	$(CC) $(CFLAGS) runtests.c $(OBJECTS) $(LDLIBS) -o $@
 
 clean:
-	rm -rf $(P) $(OBJECTS) *.gcda *.gcno *.gcov .inspect.gdb libunittest*
+	rm -rf $(P) $(OBJECTS) *.gcda *.gcno *.gcov \
+		.inspect.gdb libunittest* gmon.out
 
 libunittest.so: unittest.c
 	$(CC) -fPIC $(libflag) $(CFLAGS) -o libunittest.so lib/unittest.c
@@ -38,8 +40,18 @@ inspect: $(P)
 	gdb --command=.inspect.gdb --args $(P)
 
 valgrind: $(P)
-	#valgrind --vgdb=yes --vgdb-error=0 ./$(P)
 	valgrind --leak-check=full ./$(P)
 
 vgdb: $(P)
 	valgrind --vgdb=yes --vgdb-error=0 ./$(P)
+
+tests_yourcode.gcda gmon.out: $(P)
+	-./$(P)
+
+cov: tests_yourcode.gcda
+	gcov tests_yourcode.c
+	cat yourcode.c.gcov
+
+prof: gmon.out
+	gprof ./$(P) --flat-profile --brief
+
