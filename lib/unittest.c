@@ -244,30 +244,26 @@ fail_non_critical
 
    TEST_CASE_FAILED = 1;
 
+   // If stderr is redirected, we will need to
+   // take it back to display the error message.
+   int toggle_stderr = STDERR_OFF;
+   if (toggle_stderr) unredirect_stderr();
+
    // Don't show more than 'MAX_N_ERROR_MSG', unless
    // user passed the --showall or -a option.
    if (N_ERROR_MSG++ < MAX_N_ERROR_MSG || SHOWALL) {
-
-      // If stderr is redirected, we will need to
-      // take it back to display the error message.
-      int toggle_stderr = STDERR_OFF;
-      if (toggle_stderr) unredirect_stderr();
-
-      if (N_ERROR_MSG == MAX_N_ERROR_MSG + 1 && !SHOWALL) {
-         fprintf(stderr, "more than %d failed assertions...\n",
-               MAX_N_ERROR_MSG);
-      }
-      else {
-         fprintf(stderr, "assertion failed in %s, %s:%d: `%s'\n",
-               function, file, lineno, assertion);
-      }
-
-      // Flush stderr and put it back as it was (ie redirect
-      // it if it was redirected, or leave it as is otherwise).
-      fflush(stderr);
-      if (toggle_stderr) redirect_stderr();
-
+      fprintf(stderr, "assertion failed in %s, %s:%d: `%s'\n",
+            function, file, lineno, assertion);
    }
+   else if (N_ERROR_MSG == MAX_N_ERROR_MSG + 1) {
+      fprintf(stderr, "more than %d failed assertions...\n",
+            MAX_N_ERROR_MSG);
+   }
+
+   // Flush stderr and put it back as it was (ie redirect
+   // it if it was redirected, or leave it as is otherwise).
+   fflush(stderr);
+   if (toggle_stderr) redirect_stderr();
 
 }
 
