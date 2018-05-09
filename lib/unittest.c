@@ -252,8 +252,7 @@ fail_non_critical
    // Don't show more than 'MAX_N_ERROR_MSG', unless
    // user passed the --showall or -a option.
    if (N_ERROR_MSG++ < MAX_N_ERROR_MSG || SHOWALL) {
-      fprintf(stderr, "assertion failed in %s, %s:%d: `%s'\n",
-            function, file, lineno, assertion);
+      fprintf(stderr, "%s:%d: `%s'\n", file, lineno, assertion);
    }
    else if (N_ERROR_MSG == MAX_N_ERROR_MSG + 1) {
       fprintf(stderr, "more than %d failed assertions...\n",
