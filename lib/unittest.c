@@ -34,24 +34,28 @@ void
 update_display_failed
 (void)
 {
-   fprintf(stderr, "FAIL\n");
+   fprintf(stderr, "[FAIL]\n");
 }
 
 void
 update_display_success
 (void)
 {
-   fprintf(stderr, "  OK\n");
+   fprintf(stderr, "  [OK]\n");
 }
 
 void
-terminate_thread
+terminate_thread_upon_segfault
 (
    int sig
 )
 {
 
-   // If test was not failed so far, update display.
+   // Something terrible happened, this is the end of the test.
+   // Recover stderr for display, inform the user, clean and exit.
+   unredirect_stderr();
+   
+   // If test had not failed so far, update display.
    if (!TEST_CASE_FAILED) {
       update_display_failed();
    }
@@ -61,8 +65,6 @@ terminate_thread
    // Label the test case as failed. //
    TEST_CASE_FAILED = 1;
 
-   // Clean it all. //
-   unredirect_stderr();
    test_case_clean();
 
    // Return to main thread.
@@ -85,7 +87,7 @@ run_test
 
    // Register signal handlers. This will allow execution
    // to return to main thread in case of crash.
-   signal(SIGSEGV, terminate_thread);
+   signal(SIGSEGV, terminate_thread_upon_segfault);
    
    // Get test name and fixture (test function). //
    fixture_t fixture = test_case.fixture;
