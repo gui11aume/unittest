@@ -60,7 +60,7 @@ terminate_thread_upon_segfault
       update_display_failed();
    }
 
-   fprintf(stderr, "caught SIGTERM (interrupting)\n");
+   fprintf(stderr, "caught SIGTERM (%d): aborting test case\n", sig);
 
    // Label the test case as failed. //
    TEST_CASE_FAILED = 1;
@@ -257,8 +257,8 @@ fail_non_critical
       fprintf(stderr, "%s:%d: `%s'\n", file, lineno, assertion);
    }
    else if (N_ERROR_MSG == MAX_N_ERROR_MSG + 1) {
-      fprintf(stderr, "more than %d failed assertions...\n",
-            MAX_N_ERROR_MSG);
+      fprintf(stderr, "more than %d failed assertions in `%s'...\n",
+            MAX_N_ERROR_MSG, function);
    }
 
    // Flush stderr and put it back as it was (ie redirect
@@ -291,8 +291,8 @@ fail_critical
    // That's the end of the test case. We can
    // take back stderr without worries.
    unredirect_stderr();
-   fprintf(stderr, "assertion failed in %s, %s:%d: `%s' (CRITICAL)\n",
-         function, file, lineno, assertion);
+   fprintf(stderr, "%s:%d: `%s'\n", file, lineno, assertion);
+   fprintf(stderr, "critical: exit `%s'\n", function);
    fflush(stderr);
 
 }
@@ -308,6 +308,7 @@ fail_debug_dump
 // When a test fails, write a gdb file with a breakpoint at
 // the line where the failured happened.
 {
+   fprintf(DEBUG_DUMP_FILE, "b %s\n", function);
    fprintf(DEBUG_DUMP_FILE, "b %s:%d\n", file, lineno);
    fflush(DEBUG_DUMP_FILE);
 }
