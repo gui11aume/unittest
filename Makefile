@@ -17,7 +17,7 @@ CC= gcc
 endif
 
 INCLUDES= -Ilib
-CFLAGS= -std=gnu99 -g -Wall -Wextra $(INCLUDES)
+CFLAGS= -std=gnu99 -g -Wall -Wextra -O0 $(INCLUDES)
 COVERAGE= -fprofile-arcs -ftest-coverage
 PROFILE= -pg
 LDLIBS= -L. -Wl,-rpath,. -lunittest -lz -lm -lpthread
@@ -29,15 +29,15 @@ else
         libflag= -shared
 endif
 
-$(RUN): CFLAGS += -O2 $(COVERAGE) $(PROFILE)
+$(RUN): CFLAGS += $(COVERAGE) $(PROFILE)
 $(RUN): $(OBJECTS) $(SOURCES) $(HEADERS) runtests.c
 	$(CC) $(CFLAGS) runtests.c $(OBJECTS) $(LDLIBS) -o $@
 
-$(DBG): CFLAGS += -O0 -DDEBUG
+$(DBG): CFLAGS += -DDEBUG
 $(DBG): $(OBJECTS) $(SOURCES)
 	$(CC) $(CFLAGS) runtests.c $(OBJECTS) $(LDLIBS) -o $@
 
-$(VAL): CFLAGS += -O2 -DVALGRIND
+$(VAL): CFLAGS += -DVALGRIND
 $(VAL): $(OBJECTS) $(SOURCES)
 	$(CC) $(CFLAGS) runtests.c $(OBJECTS) $(LDLIBS) -o $@
 
