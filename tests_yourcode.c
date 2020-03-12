@@ -80,6 +80,9 @@ test_case_6
    test_assert_critical(c != NULL);
    free(c);
 
+// Wrap the cases with failed 'malloc()' in #ifndef blocks.
+// They conflict with valgrind so we need to flag them.
+#ifndef VALGRIND
    // Use 'set_alloc_failure_rate_to(p)' to cause 'malloc()'
    // (including 'calloc()' and 'realloc()') to fail randomly
    // with probability 'p'.
@@ -88,7 +91,9 @@ test_case_6
    test_assert(c == NULL);
    // Set 'malloc()' to normal mode.
    reset_alloc();
+#endif
 
+#ifndef VALGRIND
    // Use 'set_alloc_failure_countdown_to(n)' to cause 'malloc()'
    // (including 'calloc()' and 'realloc()') to systematically
    // fail after 'n' calls.
@@ -100,6 +105,7 @@ test_case_6
    c = call_malloc();
    test_assert(c == NULL);
    reset_alloc();
+#endif
 
 }
 

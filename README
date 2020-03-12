@@ -7,3 +7,7 @@ make test
 To debug the programme with smart breakpoints:
 
 make inspect
+
+To check memory leaks
+
+make valgrind

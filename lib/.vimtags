@@ -2,8 +2,10 @@
 ALLOC_ERR_PROB	/home/gfilion/src/C/unittest/lib/unittest.c	/^static double ALLOC_ERR_PROB = 0.0;$/;"	v	language:C++	file:
 ALLOC_FAIL_COUNTER	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    ALLOC_FAIL_COUNTER = 0;$/;"	v	language:C++	file:
 calloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^void * calloc (size_t nitems, size_t size) {$/;"	f	language:C++
+calloc	/home/gfilion/src/C/unittest/lib/unittest.h	/^void * calloc (size_t nitems, size_t size);$/;"	p	language:C++
 CALLOC_CALL	/home/gfilion/src/C/unittest/lib/unittest.c	/^void *(*CALLOC_CALL)(size_t, size_t) = __libc_calloc;$/;"	v	language:C++
 caught_in_stderr	/home/gfilion/src/C/unittest/lib/unittest.c	/^caught_in_stderr$/;"	f	language:C++
+caught_in_stderr	/home/gfilion/src/C/unittest/lib/unittest.h	/^char * caught_in_stderr (void);$/;"	p	language:C++
 DEBUG_DUMP_FILE	/home/gfilion/src/C/unittest/lib/unittest.c	/^static FILE * DEBUG_DUMP_FILE = NULL;$/;"	v	language:C++	file:
 fail_countdown_calloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_countdown_calloc(malloc_zone_t *zone, size_t nitems, size_t size)$/;"	f	language:C++
 fail_countdown_calloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_countdown_calloc(size_t nitems, size_t size)$/;"	f	language:C++
@@ -12,56 +14,76 @@ fail_countdown_malloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_countdo
 fail_countdown_realloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_countdown_realloc(malloc_zone_t *zone, void *ptr, size_t size)$/;"	f	language:C++
 fail_countdown_realloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_countdown_realloc(void *ptr, size_t size)$/;"	f	language:C++
 fail_critical	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_critical$/;"	f	language:C++
+fail_critical	/home/gfilion/src/C/unittest/lib/unittest.h	/^void fail_critical (const char *, const char *, int, const char *);$/;"	p	language:C++
 fail_debug_dump	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_debug_dump$/;"	f	language:C++
+fail_debug_dump	/home/gfilion/src/C/unittest/lib/unittest.h	/^void fail_debug_dump (const char *, int);$/;"	p	language:C++
 fail_non_critical	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_non_critical$/;"	f	language:C++
+fail_non_critical	/home/gfilion/src/C/unittest/lib/unittest.h	/^void fail_non_critical (const char *, const char *, int);$/;"	p	language:C++
 fail_prone_calloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_prone_calloc(malloc_zone_t *zone, size_t nitems, size_t size)$/;"	f	language:C++
 fail_prone_calloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_prone_calloc(size_t nitems, size_t size)$/;"	f	language:C++
 fail_prone_malloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_prone_malloc(malloc_zone_t *zone, size_t size)$/;"	f	language:C++
 fail_prone_malloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_prone_malloc(size_t size)$/;"	f	language:C++
 fail_prone_realloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_prone_realloc(malloc_zone_t *zone, void *ptr, size_t size)$/;"	f	language:C++
 fail_prone_realloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^fail_prone_realloc(void *ptr, size_t size)$/;"	f	language:C++
+fixture	/home/gfilion/src/C/unittest/lib/unittest.h	/^   fixture_t   fixture;$/;"	m	language:C++	struct:test_case_t
+fixture_t	/home/gfilion/src/C/unittest/lib/unittest.h	/^typedef void (*fixture_t)(void);$/;"	t	language:C++
 INSPECT	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    INSPECT = 0;$/;"	v	language:C++	file:
 machine_specific_initialization	/home/gfilion/src/C/unittest/lib/unittest.c	/^machine_specific_initialization$/;"	f	language:C++
 malloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^void * malloc (size_t size) {$/;"	f	language:C++
+malloc	/home/gfilion/src/C/unittest/lib/unittest.h	/^void * malloc (size_t size);$/;"	p	language:C++
 MALLOC_CALL	/home/gfilion/src/C/unittest/lib/unittest.c	/^void *(*MALLOC_CALL)(size_t) = __libc_malloc;$/;"	v	language:C++
 MAX_N_ERROR_MSG	/home/gfilion/src/C/unittest/lib/unittest.c	5;"	d	language:C++	file:
 N_ERROR_MSG	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    N_ERROR_MSG = 0;$/;"	v	language:C++	file:
 ORIG_STDERR_DESCRIPTOR	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    ORIG_STDERR_DESCRIPTOR = -1;$/;"	v	language:C++	file:
 realloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^void * realloc (void *ptr, size_t size) {$/;"	f	language:C++
+realloc	/home/gfilion/src/C/unittest/lib/unittest.h	/^void * realloc (void *ptr, size_t size);$/;"	p	language:C++
 REALLOC_CALL	/home/gfilion/src/C/unittest/lib/unittest.c	/^void *(*REALLOC_CALL)(void *, size_t) = __libc_realloc;$/;"	v	language:C++
 redirect_stderr	/home/gfilion/src/C/unittest/lib/unittest.c	/^redirect_stderr$/;"	f	language:C++
 redirect_stderr	/home/gfilion/src/C/unittest/lib/unittest.c	/^void   redirect_stderr (void);$/;"	p	language:C++	file:
+redirect_stderr	/home/gfilion/src/C/unittest/lib/unittest.h	/^void   redirect_stderr (void);$/;"	p	language:C++
 reset_alloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^reset_alloc$/;"	f	language:C++
 reset_alloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^reset_alloc$/;"	f	language:C++
+reset_alloc	/home/gfilion/src/C/unittest/lib/unittest.h	/^void   reset_alloc (void);$/;"	p	language:C++
 run_test	/home/gfilion/src/C/unittest/lib/unittest.c	/^run_test$/;"	f	language:C++
 run_test	/home/gfilion/src/C/unittest/lib/unittest.c	/^void * run_test (void *); $/;"	p	language:C++	file:
 run_unittest	/home/gfilion/src/C/unittest/lib/unittest.c	/^run_unittest$/;"	f	language:C++
+run_unittest	/home/gfilion/src/C/unittest/lib/unittest.h	/^int run_unittest (int, char **, const test_case_t **);$/;"	p	language:C++
 sent_to_stderr	/home/gfilion/src/C/unittest/lib/unittest.c	/^char * sent_to_stderr (void);$/;"	p	language:C++	file:
 set_alloc_failure_countdown_to	/home/gfilion/src/C/unittest/lib/unittest.c	/^set_alloc_failure_countdown_to(int count)$/;"	f	language:C++
 set_alloc_failure_countdown_to	/home/gfilion/src/C/unittest/lib/unittest.c	/^set_alloc_failure_countdown_to(int count)$/;"	f	language:C++
+set_alloc_failure_countdown_to	/home/gfilion/src/C/unittest/lib/unittest.h	/^void   set_alloc_failure_countdown_to (int);$/;"	p	language:C++
 set_alloc_failure_rate_to	/home/gfilion/src/C/unittest/lib/unittest.c	/^set_alloc_failure_rate_to(double p)$/;"	f	language:C++
 set_alloc_failure_rate_to	/home/gfilion/src/C/unittest/lib/unittest.c	/^set_alloc_failure_rate_to(double p)$/;"	f	language:C++
+set_alloc_failure_rate_to	/home/gfilion/src/C/unittest/lib/unittest.h	/^void   set_alloc_failure_rate_to (double);$/;"	p	language:C++
 SHOWALL	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    SHOWALL = 0;$/;"	v	language:C++	file:
 STDERR_BUFFER	/home/gfilion/src/C/unittest/lib/unittest.c	/^static char * STDERR_BUFFER = NULL;$/;"	v	language:C++	file:
 STDERR_OFF	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    STDERR_OFF = 0;$/;"	v	language:C++	file:
 SYSTEM_CALLOC	/home/gfilion/src/C/unittest/lib/unittest.c	/^void *(*SYSTEM_CALLOC) (malloc_zone_t *, size_t, size_t);$/;"	v	language:C++
 SYSTEM_MALLOC	/home/gfilion/src/C/unittest/lib/unittest.c	/^void *(*SYSTEM_MALLOC) (malloc_zone_t *, size_t);$/;"	v	language:C++
 SYSTEM_REALLOC	/home/gfilion/src/C/unittest/lib/unittest.c	/^void *(*SYSTEM_REALLOC) (malloc_zone_t *, void *, size_t);$/;"	v	language:C++
-terminate_thread	/home/gfilion/src/C/unittest/lib/unittest.c	/^terminate_thread$/;"	f	language:C++
+terminate_thread_upon_segfault	/home/gfilion/src/C/unittest/lib/unittest.c	/^terminate_thread_upon_segfault$/;"	f	language:C++
+test_assert	/home/gfilion/src/C/unittest/lib/unittest.h	69;"	d	language:C++
+test_assert_critical	/home/gfilion/src/C/unittest/lib/unittest.h	76;"	d	language:C++
+test_assert_stderr	/home/gfilion/src/C/unittest/lib/unittest.h	84;"	d	language:C++
 test_case_clean	/home/gfilion/src/C/unittest/lib/unittest.c	/^test_case_clean$/;"	f	language:C++
 test_case_clean	/home/gfilion/src/C/unittest/lib/unittest.c	/^void   test_case_clean (void);$/;"	p	language:C++	file:
 TEST_CASE_FAILED	/home/gfilion/src/C/unittest/lib/unittest.c	/^static int    TEST_CASE_FAILED = 0;$/;"	v	language:C++	file:
 test_case_init	/home/gfilion/src/C/unittest/lib/unittest.c	/^test_case_init$/;"	f	language:C++
 test_case_init	/home/gfilion/src/C/unittest/lib/unittest.c	/^void   test_case_init (void);$/;"	p	language:C++	file:
+test_case_t	/home/gfilion/src/C/unittest/lib/unittest.h	/^struct test_case_t {$/;"	s	language:C++
+test_case_t	/home/gfilion/src/C/unittest/lib/unittest.h	/^typedef struct test_case_t test_case_t;$/;"	t	language:C++	typeref:struct:test_case_t
+test_name	/home/gfilion/src/C/unittest/lib/unittest.h	/^   char      * test_name;$/;"	m	language:C++	struct:test_case_t
 unit_test_clean	/home/gfilion/src/C/unittest/lib/unittest.c	/^unit_test_clean$/;"	f	language:C++
 unit_test_clean	/home/gfilion/src/C/unittest/lib/unittest.c	/^void   unit_test_clean (void);$/;"	p	language:C++	file:
 unit_test_init	/home/gfilion/src/C/unittest/lib/unittest.c	/^unit_test_init$/;"	f	language:C++
 unit_test_init	/home/gfilion/src/C/unittest/lib/unittest.c	/^void   unit_test_init (void);$/;"	p	language:C++	file:
 unredirect_stderr	/home/gfilion/src/C/unittest/lib/unittest.c	/^unredirect_stderr$/;"	f	language:C++
 unredirect_stderr	/home/gfilion/src/C/unittest/lib/unittest.c	/^void   unredirect_stderr (void);$/;"	p	language:C++	file:
+unredirect_stderr	/home/gfilion/src/C/unittest/lib/unittest.h	/^void   unredirect_stderr (void);$/;"	p	language:C++
 update_display_failed	/home/gfilion/src/C/unittest/lib/unittest.c	/^update_display_failed$/;"	f	language:C++
 update_display_success	/home/gfilion/src/C/unittest/lib/unittest.c	/^update_display_success$/;"	f	language:C++
 UTEST_BUFFER_SIZE	/home/gfilion/src/C/unittest/lib/unittest.c	4;"	d	language:C++	file:
+_UNITTEST_HEADER	/home/gfilion/src/C/unittest/lib/unittest.h	29;"	d	language:C++
 __libc_calloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^extern void *__libc_calloc(size_t, size_t);$/;"	p	language:C++	file:
 __libc_malloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^extern void *__libc_malloc(size_t);$/;"	p	language:C++	file:
 __libc_realloc	/home/gfilion/src/C/unittest/lib/unittest.c	/^extern void *__libc_realloc(void *, size_t);$/;"	p	language:C++	file:

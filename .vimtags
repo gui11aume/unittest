@@ -1,0 +1,24 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+CC	/home/gfilion/src/C/unittest/Makefile	/^CC= $(TRAVIS_COMPILER)$/;"	m	language:Make
+CC	/home/gfilion/src/C/unittest/Makefile	/^CC= gcc$/;"	m	language:Make
+CFLAGS	/home/gfilion/src/C/unittest/Makefile	/^CFLAGS= -std=gnu99 -g -Wall -Wextra $(INCLUDES)$/;"	m	language:Make
+COVERAGE	/home/gfilion/src/C/unittest/Makefile	/^COVERAGE= -fprofile-arcs -ftest-coverage$/;"	m	language:Make
+DBG	/home/gfilion/src/C/unittest/Makefile	/^DBG=run_tests_for_debug$/;"	m	language:Make
+HEADERS	/home/gfilion/src/C/unittest/Makefile	/^HEADERS= yourcode.h$/;"	m	language:Make
+INCLUDES	/home/gfilion/src/C/unittest/Makefile	/^INCLUDES= -Ilib$/;"	m	language:Make
+INCLUES	/home/gfilion/src/C/unittest/Makefile	/^INCLUES= lib$/;"	m	language:Make
+LDLIBS	/home/gfilion/src/C/unittest/Makefile	/^LDLIBS= -L. -Wl,-rpath,. -lunittest -lz -lm -lpthread$/;"	m	language:Make
+libflag	/home/gfilion/src/C/unittest/Makefile	/^        libflag= -dynamiclib$/;"	m	language:Make
+libflag	/home/gfilion/src/C/unittest/Makefile	/^        libflag= -shared$/;"	m	language:Make
+OBJECTS	/home/gfilion/src/C/unittest/Makefile	/^OBJECTS= tests_yourcode.o libunittest.so$/;"	m	language:Make
+PROFILE	/home/gfilion/src/C/unittest/Makefile	/^PROFILE= -pg$/;"	m	language:Make
+RUN	/home/gfilion/src/C/unittest/Makefile	/^RUN=run_tests_for_coverage$/;"	m	language:Make
+SOURCES	/home/gfilion/src/C/unittest/Makefile	/^SOURCES= yourcode.c$/;"	m	language:Make
+test_cases_from_file_1	/home/gfilion/src/C/unittest/tests_yourcode.c	/^const test_case_t test_cases_from_file_1[] = {$/;"	v	language:C++
+test_case_1	/home/gfilion/src/C/unittest/tests_yourcode.c	/^test_case_1$/;"	f	language:C++
+test_case_2	/home/gfilion/src/C/unittest/tests_yourcode.c	/^test_case_2$/;"	f	language:C++
+test_case_3	/home/gfilion/src/C/unittest/tests_yourcode.c	/^test_case_3$/;"	f	language:C++
+test_case_4	/home/gfilion/src/C/unittest/tests_yourcode.c	/^test_case_4$/;"	f	language:C++
+test_case_5	/home/gfilion/src/C/unittest/tests_yourcode.c	/^test_case_5$/;"	f	language:C++
+test_case_6	/home/gfilion/src/C/unittest/tests_yourcode.c	/^test_case_6$/;"	f	language:C++
+VAL	/home/gfilion/src/C/unittest/Makefile	/^VAL=run_tests_for_valgrind$/;"	m	language:Make

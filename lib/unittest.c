@@ -15,17 +15,16 @@ void   test_case_clean (void);
 void   test_case_init (void);
 
 //     Global variables     //
-static double ALLOC_ERR_PROB = 0.0;
-static int    ALLOC_FAIL_COUNTER = 0;
-static FILE * DEBUG_DUMP_FILE = NULL;
-static int    N_ERROR_MSG = 0;
-static int    ORIG_STDERR_DESCRIPTOR = -1;
-static char * STDERR_BUFFER = NULL;
-static int    STDERR_OFF = 0;
-static int    TEST_CASE_FAILED = 0;
+static double ALLOC_ERR_PROB;
+static int    ALLOC_FAIL_COUNTER;
+static FILE * DEBUG_DUMP_FILE;
+static int    N_ERROR_MSG;
+static int    ORIG_STDERR_DESCRIPTOR;
+static char * STDERR_BUFFER;
+static int    STDERR_OFF;
+static int    TEST_CASE_FAILED;
 
-static int    SHOWALL = 0;
-static int    INSPECT = 0;
+static int    SHOWALL  = 0;
 
 
 //     Function definitions     //
@@ -45,26 +44,24 @@ update_display_success
 }
 
 void
-terminate_thread_upon_segfault
+terminate_thread
 (
    int sig
 )
 {
 
-   // Something terrible happened, this is the end of the test.
-   // Recover stderr for display, inform the user, clean and exit.
-   unredirect_stderr();
-   
-   // If test had not failed so far, update display.
+   // If test was not failed so far, update display.
    if (!TEST_CASE_FAILED) {
       update_display_failed();
    }
 
-   fprintf(stderr, "caught SIGTERM (%d): aborting test case\n", sig);
+   fprintf(stderr, "caught signal %d (interrupting)\n", sig);
 
    // Label the test case as failed. //
    TEST_CASE_FAILED = 1;
 
+   // Clean it all. //
+   unredirect_stderr();
    test_case_clean();
 
    // Return to main thread.
@@ -87,7 +84,7 @@ run_test
 
    // Register signal handlers. This will allow execution
    // to return to main thread in case of crash.
-   signal(SIGSEGV, terminate_thread_upon_segfault);
+   signal(SIGSEGV, terminate_thread);
    
    // Get test name and fixture (test function). //
    fixture_t fixture = test_case.fixture;
@@ -112,8 +109,7 @@ void
 unit_test_init
 (void)
 {
-   // In inspect mode, no debug information is recorded.
-   if (INSPECT) return;
+
    DEBUG_DUMP_FILE = fopen(".inspect.gdb", "w");
    if (DEBUG_DUMP_FILE == NULL) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
@@ -127,12 +123,9 @@ unit_test_clean
 (void)
 {
 
-   // In inspect mode, no debug information is recorded.
-   if (INSPECT || DEBUG_DUMP_FILE != NULL) {
-      fprintf(DEBUG_DUMP_FILE, "b run_unittest\n");
-      fprintf(DEBUG_DUMP_FILE, "run --inspect\n");
-      fclose(DEBUG_DUMP_FILE);
-   }
+   fprintf(DEBUG_DUMP_FILE, "b run_unittest\n");
+   fprintf(DEBUG_DUMP_FILE, "run\n");
+   fclose(DEBUG_DUMP_FILE);
 
 }
 
@@ -257,7 +250,7 @@ fail_non_critical
       fprintf(stderr, "%s:%d: `%s'\n", file, lineno, assertion);
    }
    else if (N_ERROR_MSG == MAX_N_ERROR_MSG + 1) {
-      fprintf(stderr, "more than %d failed assertions in `%s'...\n",
+      fprintf(stderr, "more than %d failed assertions in %s...\n",
             MAX_N_ERROR_MSG, function);
    }
 
@@ -291,8 +284,8 @@ fail_critical
    // That's the end of the test case. We can
    // take back stderr without worries.
    unredirect_stderr();
-   fprintf(stderr, "%s:%d: `%s'\n", file, lineno, assertion);
-   fprintf(stderr, "critical: exit `%s'\n", function);
+   fprintf(stderr, "assertion failed in %s, %s:%d: `%s' (CRITICAL)\n",
+         function, file, lineno, assertion);
    fflush(stderr);
 
 }
@@ -323,19 +316,6 @@ caught_in_stderr
 
 
 
-void
-machine_specific_initialization
-(void)
-{
-#ifdef __APPLE__
-   malloc_zone_t *zone = malloc_default_zone();
-   SYSTEM_MALLOC = zone->malloc;
-   SYSTEM_CALLOC = zone->calloc;
-   SYSTEM_REALLOC = zone->realloc;
-#endif
-}
-
-
 #ifdef __APPLE__
 // Intercept calls to 'malloc()' on MacOS //
 #include <malloc/malloc.h>
@@ -343,6 +323,15 @@ void *(*SYSTEM_MALLOC) (malloc_zone_t *, size_t);
 void *(*SYSTEM_CALLOC) (malloc_zone_t *, size_t, size_t);
 void *(*SYSTEM_REALLOC) (malloc_zone_t *, void *, size_t);
 
+void
+mac_specific_initialization
+(void)
+{
+   malloc_zone_t *zone = malloc_default_zone();
+   SYSTEM_MALLOC = zone->malloc;
+   SYSTEM_CALLOC = zone->calloc;
+   SYSTEM_REALLOC = zone->realloc;
+}
 
 void *
 fail_countdown_malloc(malloc_zone_t *zone, size_t size)
@@ -510,6 +499,9 @@ reset_alloc
 #endif
 
 
+
+
+
 int
 run_unittest
 (
@@ -519,37 +511,35 @@ run_unittest
 )
 {
 
-   machine_specific_initialization();
+#ifdef __APPLE__
+   mac_specific_initialization();
+#endif
 
-	// Parse command line options.
+   // Parse command line options.
    while(1) {
-      int option_index = 0;
-      static struct option long_options[] = {
-         {"showall", no_argument, &SHOWALL,  1},
-         {"inspect", no_argument, &INSPECT,  1},
-         {0, 0, 0, 0}
-      };
+     int option_index = 0;
+     static struct option long_options[] = {
+       {"showall", no_argument, &SHOWALL, 1},
+       {0, 0, 0, 0}
+     };
 
-      int c = getopt_long(argc, argv, "ai",
-            long_options, &option_index);
+     int c = getopt_long(argc, argv, "a",
+         long_options, &option_index);
 
-      // Done parsing named options. //
-      if (c == -1) break;
+     // Done parsing named options. //
+     if (c == -1) break;
 
-      switch (c) {
-      case 0:
+     switch (c) {
+       case 0:
          break;
-		case 'a':
-			SHOWALL = 1;
-			break;
-		case 'i':
-			INSPECT = 1;
-			break;
-		default:
-			fprintf(stderr, "cannot parse command line arguments\n");
-			return EXIT_FAILURE;
-		}
-	}
+       case 'a':
+         SHOWALL = 1;
+         break;
+       default:
+         fprintf(stderr, "cannot parse command line arguments\n");
+         return EXIT_FAILURE;
+     }
+   }
 
    // Initialize test. //
    unit_test_init();
@@ -561,26 +551,26 @@ run_unittest
    // Run test cases in sequential order.
    for (int j = 0 ; test_case_list[j] != NULL ; j++) {
 
-      const test_case_t *tests = test_case_list[j];
-      for (int i = 0 ; tests[i].fixture != NULL ; i++) {
+     const test_case_t *tests = test_case_list[j];
+     for (int i = 0 ; tests[i].fixture != NULL ; i++) {
 
-         // Display of the test. //
-         fprintf(stderr, "%s%*s", tests[i].test_name,
-                  28 - (int) strlen(tests[i].test_name), "");
+       // Test display. //
+       fprintf(stderr, "%s%*s", tests[i].test_name,
+           35 - (int) strlen(tests[i].test_name), "");
 
-         // Run test case in thread. //
-         pthread_create(&tid, NULL, run_test, (void *) &tests[i]);
-         pthread_join(tid, NULL);
+       // Run test case in separate thread. //
+       pthread_create(&tid, NULL, run_test, (void *) &tests[i]);
+       pthread_join(tid, NULL);
 
-         if (TEST_CASE_FAILED) {
-				// Display was updated if test failed. 
-            nbad++;
-         }
-         else {
-            update_display_success();
-         }
+       if (TEST_CASE_FAILED) {
+         // Display was updated if test failed. 
+         nbad++;
+       }
+       else {
+         update_display_success();
+       }
 
-      }
+     }
 
    }
 
