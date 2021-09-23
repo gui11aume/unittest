@@ -18,6 +18,7 @@ void   unredirect_stderr (void);
 static double ALLOC_ERR_PROB;
 static int    ALLOC_FAIL_COUNTER;
 static FILE * DEBUG_DUMP_FILE;
+static int    DEVNULL;
 static int    N_ERROR_MSG;
 static int    ORIG_STDERR_DESCRIPTOR;
 static char * STDERR_BUFFER;
@@ -181,13 +182,13 @@ redirect_stderr
    if (STDERR_OFF) return;
    fflush(stderr);
    // Get a file descriptor for /dev/null.
-   int temp = open("/dev/null", O_WRONLY);
-   if (temp == -1) {
+   DEVNULL = open("/dev/null", O_WRONLY);
+   if (DEVNULL == -1) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
    // Set the file descriptor of stderr to that.
-   if (dup2(temp, STDERR_FILENO) == -1) {
+   if (dup2(DEVNULL, STDERR_FILENO) == -1) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
@@ -196,11 +197,6 @@ redirect_stderr
    // By default, stderr is not buffered. We change that and
    // give it the internal buffer 'STDERR_BUFFER'.
    if (setvbuf(stderr, STDERR_BUFFER, _IOFBF, UTEST_BUFFER_SIZE) != 0) {
-      fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-   }
-   // We can close temp. We just needed the file descriptor.
-   if (close(temp) == -1) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
@@ -217,6 +213,10 @@ unredirect_stderr
 {
    if (!STDERR_OFF) return;
    fflush(stderr);
+   if (close(DEVNULL) == -1) {
+      fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+   }
    // Set the file descriptor of stderr to its original value.
    if (dup2(ORIG_STDERR_DESCRIPTOR, STDERR_FILENO) == -1) {
       // Could not restore stderr. No need to give an error
