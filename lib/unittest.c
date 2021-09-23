@@ -8,11 +8,11 @@
 void   redirect_stderr (void);
 void * run_test (void *); 
 char * sent_to_stderr (void);
+void   test_case_clean (void);
+void   test_case_init (void);
 void   unit_test_clean (void);
 void   unit_test_init (void);
 void   unredirect_stderr (void);
-void   test_case_clean (void);
-void   test_case_init (void);
 
 //     Global variables     //
 static double ALLOC_ERR_PROB;
@@ -142,12 +142,18 @@ test_case_init
    TEST_CASE_FAILED = 0;
    STDERR_OFF = 0;
 
+   // Get the original file descriptor of stderr.
+   // We need this information to toggle redirection
+   // to n internal buffer (see 'redirect_stderr()'
+   // and 'unredirect_stderr()').
    ORIG_STDERR_DESCRIPTOR = dup(STDERR_FILENO);
    if (ORIG_STDERR_DESCRIPTOR == -1) {
       fprintf(stderr, "unittest error (%s:%d)\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
 
+   // The internal buffer 'STDERR_BUFFER' will hold
+   // the content of stderr when redirected.
    STDERR_BUFFER = calloc(UTEST_BUFFER_SIZE, sizeof(char));
    if (STDERR_BUFFER == NULL) {
       fprintf(stderr, "unittest error (%s:%d)\n", __FILE__, __LINE__);
@@ -173,26 +179,32 @@ redirect_stderr
 (void)
 {
    if (STDERR_OFF) return;
-   // Flush stderr, redirect to /dev/null and set buffer.
    fflush(stderr);
+   // Get a file descriptor for /dev/null.
    int temp = open("/dev/null", O_WRONLY);
    if (temp == -1) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
+   // Set the file descriptor of stderr to that.
    if (dup2(temp, STDERR_FILENO) == -1) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
-   memset(STDERR_BUFFER, '\0', UTEST_BUFFER_SIZE * sizeof(char));
+   // Erase buffer holding incoming stderr.
+   bzero(STDERR_BUFFER, UTEST_BUFFER_SIZE * sizeof(char));
+   // By default, stderr is not buffered. We change that and
+   // give it the internal buffer 'STDERR_BUFFER'.
    if (setvbuf(stderr, STDERR_BUFFER, _IOFBF, UTEST_BUFFER_SIZE) != 0) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
+   // We can close temp. We just needed the file descriptor.
    if (close(temp) == -1) {
       fprintf(stderr, "unittest error: %s:%d\n", __FILE__, __LINE__);
       exit(EXIT_FAILURE);
    }
+   // Send a character to stderr to start filling the buffer.
    fprintf(stderr, "$");
    fflush(stderr);
    STDERR_OFF = 1;
@@ -205,6 +217,7 @@ unredirect_stderr
 {
    if (!STDERR_OFF) return;
    fflush(stderr);
+   // Set the file descriptor of stderr to its original value.
    if (dup2(ORIG_STDERR_DESCRIPTOR, STDERR_FILENO) == -1) {
       // Could not restore stderr. No need to give an error
       // message because it will not appear.
